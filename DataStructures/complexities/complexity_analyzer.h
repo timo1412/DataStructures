@@ -141,16 +141,10 @@ namespace ds::utils
     template<class Structure>
     void ComplexityAnalyzer<Structure>::analyze(Structure structurePrototype)
     {
-        // TODO 01
-        // po implementacii vymazte vyhodenie vynimky!
-        //throw std::runtime_error("Not implemented yet");
-
         std::map<size_t, std::vector<duration_t>> duration;
-
         for (int replication = 0 ; replication < getReplicationCount() ; replication++)
         {
             Structure structure(structurePrototype);
-            //for replikacia
             for (int step = 0; step < getStepCount(); step++)
             {
                 size_t structure_size = (step + 1) * this->getStepSize();

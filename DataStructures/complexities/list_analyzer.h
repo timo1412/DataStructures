@@ -76,12 +76,15 @@ namespace ds::utils
 
     template<class List>
     ListAnalyzer<List>::ListAnalyzer(const std::string& name) :
-        ComplexityAnalyzer<List>(name, std::function<void(List&, size_t)>()),
+        ComplexityAnalyzer<List>(name, [this](List& list,size_t n)
+        {
+                this->insertNElements(list, n);
+        }),
         //                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
         // TODO 01 Namiesto defaultne vytvoreného - prázdneho - funkèného objektu je potrebné
         //         parameter správne inicializova!
-        rngData_(std::random_device()()),
-        rngIndex_(std::random_device()()),
+        rngData_(144),
+        rngIndex_(144),
         index_(0),
         data_(0)
     {
@@ -127,7 +130,9 @@ namespace ds::utils
     {
         // TODO 01
         // po implementacii vymazte vyhodenie vynimky!
-        throw std::runtime_error("Not implemented yet");
+        //throw std::runtime_error("Not implemented yet");
+        auto data = this->getRandomData();
+        structure.insert(structure.begin(), data);
     }
 
     template <class List>
@@ -141,6 +146,7 @@ namespace ds::utils
     {
         // TODO 01
         // po implementacii vymazte vyhodenie vynimky!
-        throw std::runtime_error("Not implemented yet");
+        //throw std::runtime_error("Not implemented yet");
+        structure.erase(structure.begin());
     }
 }
