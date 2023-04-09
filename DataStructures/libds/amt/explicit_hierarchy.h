@@ -238,7 +238,12 @@ namespace ds::amt {
 	{
 		// TODO 06
 		// po implementacii vymazte vyhodenie vynimky!
-		throw std::runtime_error("Not implemented yet");
+		//throw std::runtime_error("Not implemented yet");
+		this->processPostOrder(root_, [&](BlockType* b)
+			{
+				AMS<BlockType>::memoryManager_->releaseMemory(b);
+			});
+		root_ = nullptr;
 	}
 
 	template<typename BlockType>
@@ -246,7 +251,8 @@ namespace ds::amt {
 	{
 		// TODO 06
 		// po implementacii vymazte vyhodenie vynimky!
-		throw std::runtime_error("Not implemented yet");
+		//throw std::runtime_error("Not implemented yet");
+		return root_ != nullptr ? Hierarchy<BlockType>::nodeCount(*root_) : 0;
 	}
 
 	template<typename BlockType>
@@ -254,7 +260,8 @@ namespace ds::amt {
 	{
 		// TODO 06
 		// po implementacii vymazte vyhodenie vynimky!
-		throw std::runtime_error("Not implemented yet");
+		//throw std::runtime_error("Not implemented yet");
+		return root_ == nullptr;
 	}
 
 	template<typename BlockType>
@@ -296,7 +303,8 @@ namespace ds::amt {
 	{
 		// TODO 06
 		// po implementacii vymazte vyhodenie vynimky!
-		throw std::runtime_error("Not implemented yet");
+		//throw std::runtime_error("Not implemented yet");
+		return root_;
 	}
 
 	template<typename BlockType>
@@ -304,7 +312,8 @@ namespace ds::amt {
 	{
 		// TODO 06
 		// po implementacii vymazte vyhodenie vynimky!
-		throw std::runtime_error("Not implemented yet");
+		//throw std::runtime_error("Not implemented yet");
+		return static_cast<BlockType*>(node.parent_);
 	}
 
 	template<typename BlockType>
@@ -312,7 +321,9 @@ namespace ds::amt {
 	{
 		// TODO 06
 		// po implementacii vymazte vyhodenie vynimky!
-		throw std::runtime_error("Not implemented yet");
+		//throw std::runtime_error("Not implemented yet");
+		root_ = AMS<BlockType>::memoryManager_->allocateMemory();
+		return *root_;
 	}
 
 	template<typename BlockType>
@@ -320,7 +331,12 @@ namespace ds::amt {
 	{
 		// TODO 06
 		// po implementacii vymazte vyhodenie vynimky!
-		throw std::runtime_error("Not implemented yet");
+		//throw std::runtime_error("Not implemented yet");
+		if (newRoot != nullptr)
+		{
+			newRoot->parent_ = nullptr;
+		}
+		root_ = newRoot;
 	}
 
 	template<typename DataType>
@@ -342,6 +358,7 @@ namespace ds::amt {
 		// TODO 06
 		// po implementacii vymazte vyhodenie vynimky!
 		// throw std::runtime_error("Not implemented yet");
+		this->clear();
     }
 
     template<typename DataType>
@@ -349,7 +366,8 @@ namespace ds::amt {
 	{
 		// TODO 06
 		// po implementacii vymazte vyhodenie vynimky!
-		throw std::runtime_error("Not implemented yet");
+		//throw std::runtime_error("Not implemented yet");
+		return node.sons_->size();
 	}
 
 	template<typename DataType>
@@ -357,7 +375,9 @@ namespace ds::amt {
 	{
 		// TODO 06
 		// po implementacii vymazte vyhodenie vynimky!
-		throw std::runtime_error("Not implemented yet");
+		//throw std::runtime_error("Not implemented yet");
+		MemoryBlock<BlockType*>* sonBlock = node.sons_->access(sonOrder);
+		return sonBlock != nullptr ? sonBlock->data_ : nullptr;
 	}
 
 	template<typename DataType>
@@ -365,7 +385,11 @@ namespace ds::amt {
 	{
 		// TODO 06
 		// po implementacii vymazte vyhodenie vynimky!
-		throw std::runtime_error("Not implemented yet");
+		//throw std::runtime_error("Not implemented yet");
+		BlockType* newSon = AMS<BlockType>::memoryManager_->allocateMemory();
+		parent.sons_->insert(sonOrder).data_ = newSon;
+		newSon->parent_ = &parent;
+		return *newSon;
 	}
 
 	template<typename DataType>
@@ -373,7 +397,18 @@ namespace ds::amt {
 	{
 		// TODO 06
 		// po implementacii vymazte vyhodenie vynimky!
-		throw std::runtime_error("Not implemented yet");
+		//throw std::runtime_error("Not implemented yet"); <*<
+		MemoryBlock<BlockType*>* blockSons = parent.sons_->access(sonOrder);
+		BlockType* previousSon = blockSons->data_;
+		blockSons->data_ = newSon;
+		if (previousSon!= nullptr)
+		{
+			previousSon->parent_ = nullptr;
+		}
+		if (newSon != nullptr)
+		{
+			newSon->parent_ = &parent;
+		}
 	}
 
 	template<typename DataType>
@@ -381,7 +416,14 @@ namespace ds::amt {
 	{
 		// TODO 06
 		// po implementacii vymazte vyhodenie vynimky!
-		throw std::runtime_error("Not implemented yet");
+		//throw std::runtime_error("Not implemented yet");
+		MemoryBlock<BlockType*>* blockSons = parent.sons_->access(sonOrder);
+		BlockType* deleteSon = blockSons->data_;
+		this->processPostOrder(deleteSon, [&](BlockType* b)
+			{
+				AMS<BlockType>::memoryManager_->releaseMemory(b);
+			});
+		parent.sons_->remove(sonOrder);
 	}
 
 	template<typename DataType, size_t K>
@@ -403,6 +445,7 @@ namespace ds::amt {
 		// TODO 06
 		// po implementacii vymazte vyhodenie vynimky!
 		// throw std::runtime_error("Not implemented yet");
+		this->clear();
     }
 
     template<typename DataType, size_t K>
@@ -410,7 +453,16 @@ namespace ds::amt {
 	{
 		// TODO 06
 		// po implementacii vymazte vyhodenie vynimky!
-		throw std::runtime_error("Not implemented yet");
+		//throw std::runtime_error("Not implemented yet");
+		int result = 0;
+		for (BlockType* son : *node.sons_)
+		{
+			if (son != nullptr)
+			{
+				result++;
+			}
+		}
+		return result;
 	}
 
 	template<typename DataType, size_t K>
@@ -418,7 +470,9 @@ namespace ds::amt {
 	{
 		// TODO 06
 		// po implementacii vymazte vyhodenie vynimky!
-		throw std::runtime_error("Not implemented yet");
+		//throw std::runtime_error("Not implemented yet");
+		MemoryBlock<BlockType*>* sonBlock = node.sons_->access(sonOrder);
+		return sonBlock != nullptr ? sonBlock->data_ : nullptr;
 	}
 
 	template<typename DataType, size_t K>
@@ -426,7 +480,11 @@ namespace ds::amt {
 	{
 		// TODO 06
 		// po implementacii vymazte vyhodenie vynimky!
-		throw std::runtime_error("Not implemented yet");
+		//throw std::runtime_error("Not implemented yet");
+		BlockType* newSon = AMS<BlockType>::memoryManager_->allocateMemory();
+		parent.sons_->access(sonOrder)->data_ = newSon;
+		newSon->parent_ = &parent;
+		return *newSon;
 	}
 
 	template<typename DataType, size_t K>
@@ -434,7 +492,18 @@ namespace ds::amt {
 	{
 		// TODO 06
 		// po implementacii vymazte vyhodenie vynimky!
-		throw std::runtime_error("Not implemented yet");
+		//throw std::runtime_error("Not implemented yet");
+		MemoryBlock<BlockType*>* blockSons = parent.sons_->access(sonOrder);
+		BlockType* lastSon = blockSons->data_;
+		blockSons->data_ = newSon;
+		if (lastSon != nullptr)
+		{
+			lastSon->parent_ = nullptr;
+		}
+		if (newSon != nullptr)
+		{
+			newSon->parent_ = &parent;
+		}
 	}
 
 	template<typename DataType, size_t K>
@@ -442,7 +511,14 @@ namespace ds::amt {
 	{
 		// TODO 06
 		// po implementacii vymazte vyhodenie vynimky!
-		throw std::runtime_error("Not implemented yet");
+		//throw std::runtime_error("Not implemented yet");
+		MemoryBlock<BlockType*>* blockSons = parent.sons_->access(sonOrder);
+		BlockType* deleteSon = blockSons->data_;
+		this->processPostOrder(deleteSon, [&](BlockType* b)
+			{
+				AMS<BlockType>::memoryManager_->releaseMemory(b);
+			});
+		blockSons->data_ = nullptr;
 	}
 
 	template<typename DataType>
@@ -464,6 +540,7 @@ namespace ds::amt {
 		// TODO 06
 		// po implementacii vymazte vyhodenie vynimky!
 		// throw std::runtime_error("Not implemented yet");
+		this->clear();
     }
 
     template<typename DataType>
