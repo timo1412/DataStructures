@@ -195,7 +195,15 @@ namespace ds::amt {
 	{
 		// TODO 05
 		// po implementacii vymazte vyhodenie vynimky!
-		throw std::runtime_error("Not implemented yet");
+		//throw std::runtime_error("Not implemented yet");
+		int level = 0;
+		BlockType* father = this->accessParent(node);
+		while (father != nullptr)
+		{
+			level++;
+			father = this->accessParent(*father);
+		}
+		return level;
 	}
 
 	template<typename BlockType>
@@ -219,7 +227,8 @@ namespace ds::amt {
 	{
 		// TODO 05
 		// po implementacii vymazte vyhodenie vynimky!
-		throw std::runtime_error("Not implemented yet");
+		//throw std::runtime_error("Not implemented yet");
+		return this->accessParent(node) == nullptr;
 	}
 
 	template<typename BlockType>
@@ -227,7 +236,9 @@ namespace ds::amt {
 	{
 		// TODO 05
 		// po implementacii vymazte vyhodenie vynimky!
-		throw std::runtime_error("Not implemented yet");
+		//throw std::runtime_error("Not implemented yet");
+		BlockType* parent = this->accessParent(node);
+		return parent != nullptr && this->accessSon(*parent, sonOrder) == &node;
 	}
 
 	template<typename BlockType>
@@ -235,7 +246,8 @@ namespace ds::amt {
 	{
 		// TODO 05
 		// po implementacii vymazte vyhodenie vynimky!
-		throw std::runtime_error("Not implemented yet");
+		//throw std::runtime_error("Not implemented yet");
+		return this->degree(node) == 0;
 	}
 
 	template<typename BlockType>
@@ -243,7 +255,8 @@ namespace ds::amt {
 	{
 		// TODO 05
 		// po implementacii vymazte vyhodenie vynimky!
-		throw std::runtime_error("Not implemented yet");
+		//throw std::runtime_error("Not implemented yet");
+		return this->accessSon(node, sonOrder) != nullptr;
 	}
 
 	template<typename BlockType>
@@ -251,7 +264,24 @@ namespace ds::amt {
 	{
 		// TODO 05
 		// po implementacii vymazte vyhodenie vynimky!
-		throw std::runtime_error("Not implemented yet");
+		//throw std::runtime_error("Not implemented yet");
+		if (node != nullptr)
+		{
+			operation(node);
+			int levelNode = this->degree(*node);
+			int orderSon = 0;
+			int countProcessSon = 0;
+			while (countProcessSon < levelNode)
+			{
+				BlockType* son = this->accessSon(*node, orderSon);
+				if (son != nullptr)
+				{
+					this->processPreOrder(son, operation);
+					countProcessSon++;
+				}
+				orderSon++;
+			}
+		}
 	}
 
 	template<typename BlockType>
@@ -259,7 +289,24 @@ namespace ds::amt {
 	{
 		// TODO 05
 		// po implementacii vymazte vyhodenie vynimky!
-		throw std::runtime_error("Not implemented yet");
+		//throw std::runtime_error("Not implemented yet");
+		if (node != nullptr)
+		{
+			int levelNode = this->degree(*node);
+			int sonOrder = 0;
+			int countProcessSon = 0;
+			while (countProcessSon < levelNode)
+			{
+				BlockType* son =  this->accessSon(*node, sonOrder);
+				if (son != nullptr)
+				{
+					this->processPostOrder(son, operation);
+					countProcessSon++;
+				}
+				sonOrder++;
+			}
+			operation(node);
+		}
 	}
 
 	template<typename BlockType>
@@ -299,7 +346,13 @@ namespace ds::amt {
 	{
 		// TODO 05
 		// po implementacii vymazte vyhodenie vynimky!
-		throw std::runtime_error("Not implemented yet");
+		//throw std::runtime_error("Not implemented yet");
+		if (node != nullptr)
+		{
+			this->processInOrder(this->accessLeftSon(*node), operation);
+			operation(node);
+			this->processInOrder(this->accessRightSon(*node), operation);
+		}
 	}
 
 	template<typename BlockType>
