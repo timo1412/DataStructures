@@ -29,8 +29,8 @@ namespace ds::amt {
 		BlockType& insertFirst() override;
 		BlockType& insertLast() override;
 		BlockType& insert(size_t index) override;
-		BlockType& insertAfter(const BlockType& block) override;
-		BlockType& insertBefore(const BlockType& block) override;
+		BlockType& insertAfter(BlockType& block) override;
+		BlockType& insertBefore(BlockType& block) override;
 
 		void removeFirst() override;
 		void removeLast() override;
@@ -114,7 +114,8 @@ namespace ds::amt {
 	{
 		// TODO 03
 		// po implementacii vymazte vyhodenie vynimky!
-		throw std::runtime_error("Not implemented yet");
+		//throw std::runtime_error("Not implemented yet");
+		return this->getMemoryManager()->calculateIndex(block);
 	}
 
 	template<typename DataType>
@@ -122,7 +123,8 @@ namespace ds::amt {
     {
 		// TODO 03
 		// po implementacii vymazte vyhodenie vynimky!
-		throw std::runtime_error("Not implemented yet");
+		//throw std::runtime_error("Not implemented yet");
+		return this->size() > 0 ? &this->getMemoryManager()->getBlockAt(0) : nullptr;
 	}
 
 	template<typename DataType>
@@ -130,7 +132,8 @@ namespace ds::amt {
     {
 		// TODO 03
 		// po implementacii vymazte vyhodenie vynimky!
-		throw std::runtime_error("Not implemented yet");
+		//throw std::runtime_error("Not implemented yet");
+		return this->size() > 0 ? &this->getMemoryManager()->getBlockAt(this->size() - 1) : nullptr;
 	}
 
 	template<typename DataType>
@@ -138,7 +141,12 @@ namespace ds::amt {
     {
 		// TODO 03
 		// po implementacii vymazte vyhodenie vynimky!
-		throw std::runtime_error("Not implemented yet");
+		//throw std::runtime_error("Not implemented yet");
+		//typename ImplicitAMS<DataType>::MemoryManagerType* memManager = this->getMemoryManager();
+		if (index >= 0 && index < this->size())
+			return &this->getMemoryManager()->getBlockAt(index);
+		else
+			return nullptr;
 	}
 
 	template<typename DataType>
@@ -146,7 +154,10 @@ namespace ds::amt {
     {
 		// TODO 03
 		// po implementacii vymazte vyhodenie vynimky!
-		throw std::runtime_error("Not implemented yet");
+		//throw std::runtime_error("Not implemented yet");
+		typename ImplicitAMS<DataType>::MemoryManagerType* memManager = this->getMemoryManager();
+		int index = indexOfNext(memManager->calculateIndex(block));
+		return index < this->size() ? &memManager->getBlockAt(index) : nullptr;
 	}
 
 	template<typename DataType>
@@ -154,7 +165,10 @@ namespace ds::amt {
     {
 		// TODO 03
 		// po implementacii vymazte vyhodenie vynimky!
-		throw std::runtime_error("Not implemented yet");
+		//throw std::runtime_error("Not implemented yet");
+		typename ImplicitAMS<DataType>::MemoryManagerType* memManager = this->getMemoryManager();
+		int index = indexOfPrevious(memManager->calculateIndex(block));
+		return index != INVALID_INDEX ? &memManager->getBlockAt(index) : nullptr;
 	}
 
 	template<typename DataType>
@@ -162,7 +176,7 @@ namespace ds::amt {
     {
 		// TODO 03
 		// po implementacii vymazte vyhodenie vynimky!
-		throw std::runtime_error("Not implemented yet");
+		return *this->getMemoryManager()->allocateMemoryAt(0);
 	}
 
 	template<typename DataType>
@@ -170,7 +184,8 @@ namespace ds::amt {
     {
 		// TODO 03
 		// po implementacii vymazte vyhodenie vynimky!
-		throw std::runtime_error("Not implemented yet");
+		//throw std::runtime_error("Not implemented yet");
+		return *this->getMemoryManager()->allocateMemory();
 	}
 
 	template<typename DataType>
@@ -178,24 +193,28 @@ namespace ds::amt {
     {
 		// TODO 03
 		// po implementacii vymazte vyhodenie vynimky!
-		throw std::runtime_error("Not implemented yet");
+		//throw std::runtime_error("Not implemented yet");
+		return *this->getMemoryManager()->allocateMemoryAt(index);
 	}
 
 	template<typename DataType>
-    auto ImplicitSequence<DataType>::insertAfter(const BlockType& block) -> BlockType&
+    auto ImplicitSequence<DataType>::insertAfter(BlockType& block) -> BlockType&
     {
 		// TODO 03
 		// po implementacii vymazte vyhodenie vynimky!
-		throw std::runtime_error("Not implemented yet");
+		//throw std::runtime_error("Not implemented yet");
+		typename ImplicitAMS<DataType>::MemoryManagerType* memManager = this->getMemoryManager();
+		return *memManager->allocateMemoryAt(memManager->calculateIndex(block) + 1);
 	}
 
 	template<typename DataType>
-    auto ImplicitSequence<DataType>::insertBefore(const BlockType& block) -> BlockType&
+    auto ImplicitSequence<DataType>::insertBefore(BlockType& block) -> BlockType&
     {
 		// TODO 03
 		// po implementacii vymazte vyhodenie vynimky!
-		throw std::runtime_error("Not implemented yet");
-
+		//throw std::runtime_error("Not implemented yet");
+		typename ImplicitAMS<DataType>::MemoryManagerType* memManager = this->getMemoryManager();
+		return *memManager->allocateMemoryAt(memManager->calculateIndex(block));
 	}
 
 	template<typename DataType>
@@ -203,7 +222,8 @@ namespace ds::amt {
 	{
 		// TODO 03
 		// po implementacii vymazte vyhodenie vynimky!
-		throw std::runtime_error("Not implemented yet");
+		//throw std::runtime_error("Not implemented yet");
+		this->getMemoryManager()->releaseMemoryAt(0);
 	}
 
 	template<typename DataType>
@@ -211,7 +231,8 @@ namespace ds::amt {
 	{
 		// TODO 03
 		// po implementacii vymazte vyhodenie vynimky!
-		throw std::runtime_error("Not implemented yet");
+		//throw std::runtime_error("Not implemented yet");
+		this->getMemoryManager()->releaseMemory();
 	}
 
 	template<typename DataType>
@@ -219,7 +240,8 @@ namespace ds::amt {
 	{
 		// TODO 03
 		// po implementacii vymazte vyhodenie vynimky!
-		throw std::runtime_error("Not implemented yet");
+		//throw std::runtime_error("Not implemented yet");
+		this->getMemoryManager()->releaseMemoryAt(index);
 	}
 
 	template<typename DataType>
@@ -227,7 +249,12 @@ namespace ds::amt {
 	{
 		// TODO 03
 		// po implementacii vymazte vyhodenie vynimky!
-		throw std::runtime_error("Not implemented yet");
+		//throw std::runtime_error("Not implemented yet");
+
+		/*typename ImplicitAMS<DataType>::MemoryManagerType* memManager = this->getMemoryManager();
+		memManager->releaseMemoryAt(indexOfNext(memManager->calculateIndex(block)));*/
+
+		this->getMemoryManager()->releaseMemoryAt(this->indexOfNext(this->getMemoryManager()->calculateIndex(block)));
 	}
 
 	template<typename DataType>
@@ -235,7 +262,8 @@ namespace ds::amt {
 	{
 		// TODO 03
 		// po implementacii vymazte vyhodenie vynimky!
-		throw std::runtime_error("Not implemented yet");
+		//throw std::runtime_error("Not implemented yet");
+		this->getMemoryManager()->releaseMemoryAt(this->indexOfPrevious(this->getMemoryManager()->calculateIndex(block)));
 	}
 
 	template<typename DataType>
@@ -243,7 +271,8 @@ namespace ds::amt {
 	{
 		// TODO 03
 		// po implementacii vymazte vyhodenie vynimky!
-		throw std::runtime_error("Not implemented yet");
+		//throw std::runtime_error("Not implemented yet");
+		this->getMemoryManager()->changeCapacity(capacity);
 	}
 
 	template<typename DataType>
@@ -251,7 +280,10 @@ namespace ds::amt {
 	{
 		// TODO 03
 		// po implementacii vymazte vyhodenie vynimky!
-		throw std::runtime_error("Not implemented yet");
+		//throw std::runtime_error("Not implemented yet");
+		if (currentIndex >= this->size() - 1)
+			return -1;
+		return currentIndex + 1;
 	}
 
 	template<typename DataType>
@@ -259,7 +291,12 @@ namespace ds::amt {
 	{
 		// TODO 03
 		// po implementacii vymazte vyhodenie vynimky!
-		throw std::runtime_error("Not implemented yet");
+		//throw std::runtime_error("Not implemented yet");
+		if (currentIndex <= 0)
+			return -1;
+		return currentIndex - 1;
+			
+		
 	}
 
     template <typename DataType>
@@ -283,7 +320,9 @@ namespace ds::amt {
     {
 		// TODO 03
 		// po implementacii vymazte vyhodenie vynimky!
-		throw std::runtime_error("Not implemented yet");
+		//throw std::runtime_error("Not implemented yet");
+		++position_;
+		return *this;
     }
 
     template <typename DataType>
@@ -299,7 +338,8 @@ namespace ds::amt {
     {
 		// TODO 03
 		// po implementacii vymazte vyhodenie vynimky!
-		throw std::runtime_error("Not implemented yet");
+		//throw std::runtime_error("Not implemented yet");
+		return sequence_ == other.sequence_ && position_ == other.position_;
     }
 
     template <typename DataType>
@@ -313,7 +353,8 @@ namespace ds::amt {
     {
 		// TODO 03
 		// po implementacii vymazte vyhodenie vynimky!
-		throw std::runtime_error("Not implemented yet");
+		//throw std::runtime_error("Not implemented yet");
+		return sequence_->access(position_)->data_;
     }
 
     template <typename DataType>
@@ -345,7 +386,9 @@ namespace ds::amt {
 	{
 		// TODO 03
 		// po implementacii vymazte vyhodenie vynimky!
-		throw std::runtime_error("Not implemented yet");
+		//throw std::runtime_error("Not implemented yet");
+		const size_t size = this->size();
+		return size != 0 ? currentIndex >= size - 1 ? 0 : currentIndex + 1 : -1;
 	}
 
 	template<typename DataType>
@@ -353,7 +396,10 @@ namespace ds::amt {
 	{
 		// TODO 03
 		// po implementacii vymazte vyhodenie vynimky!
-		throw std::runtime_error("Not implemented yet");
+		//throw std::runtime_error("Not implemented yet");
+
+		const size_t size = this->size();
+		return size != 0 ? currentIndex <= 0 ? size - 1 : currentIndex - 1 : -1;
 	}
 
 }
