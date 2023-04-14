@@ -137,6 +137,8 @@ namespace ds::adt {
 		// TODO 07
         // po implementacii vymazte vyhodenie vynimky!
         throw std::runtime_error("Not implemented yet");
+		int result = 0;
+		
 	}
 
 	template<typename T, typename SequenceType>
