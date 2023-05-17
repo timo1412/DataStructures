@@ -172,9 +172,9 @@
     <ClInclude Include="libds\amt\implicit_hierarchy.h" />
     <ClInclude Include="libds\amt\implicit_sequence.h" />
     <ClInclude Include="libds\amt\network.h" />
-    <ClInclude Include="libds\amt\sequence.h" />
     <ClInclude Include="complexities\complexity_analyzer.h" />
     <ClInclude Include="complexities\list_analyzer.h" />
+    <ClInclude Include="libds\amt\sequence.h" />
     <ClInclude Include="libds\constants.h" />
     <ClInclude Include="libds\heap_monitor.h" />
     <ClInclude Include="libds\mm\compact_memory_manager.h" />

@@ -96,12 +96,6 @@
     <ClInclude Include="libds\adt\list.h">
       <Filter>libds\adt</Filter>
     </ClInclude>
-    <ClInclude Include="libds\adt\queue.h">
-      <Filter>libds\adt</Filter>
-    </ClInclude>
-    <ClInclude Include="libds\adt\stack.h">
-      <Filter>libds\adt</Filter>
-    </ClInclude>
     <ClInclude Include="libds\adt\table.h">
       <Filter>libds\adt</Filter>
     </ClInclude>
@@ -114,28 +108,10 @@
     <ClInclude Include="libds\amt\abstract_memory_type.h">
       <Filter>libds\amt</Filter>
     </ClInclude>
-    <ClInclude Include="libds\amt\explicit_hierarchy.h">
-      <Filter>libds\amt</Filter>
-    </ClInclude>
     <ClInclude Include="libds\amt\explicit_network.h">
       <Filter>libds\amt</Filter>
     </ClInclude>
-    <ClInclude Include="libds\amt\explicit_sequence.h">
-      <Filter>libds\amt</Filter>
-    </ClInclude>
-    <ClInclude Include="libds\amt\hierarchy.h">
-      <Filter>libds\amt</Filter>
-    </ClInclude>
-    <ClInclude Include="libds\amt\implicit_hierarchy.h">
-      <Filter>libds\amt</Filter>
-    </ClInclude>
-    <ClInclude Include="libds\amt\implicit_sequence.h">
-      <Filter>libds\amt</Filter>
-    </ClInclude>
     <ClInclude Include="libds\amt\network.h">
-      <Filter>libds\amt</Filter>
-    </ClInclude>
-    <ClInclude Include="libds\amt\sequence.h">
       <Filter>libds\amt</Filter>
     </ClInclude>
     <ClInclude Include="libds\constants.h">
@@ -149,9 +125,6 @@
     </ClInclude>
     <ClInclude Include="tests\_details\console_output.hpp">
       <Filter>tests\_details</Filter>
-    </ClInclude>
-    <ClInclude Include="libds\adt\priority_queue.h">
-      <Filter>libds\adt</Filter>
     </ClInclude>
     <ClInclude Include="libds\mm\compact_memory_manager.h">
       <Filter>libds\mm</Filter>
@@ -191,6 +164,33 @@
     </ClInclude>
     <ClInclude Include="tests\adt\tree.test.h">
       <Filter>tests\adt</Filter>
+    </ClInclude>
+    <ClInclude Include="libds\amt\explicit_hierarchy.h">
+      <Filter>libds\amt</Filter>
+    </ClInclude>
+    <ClInclude Include="libds\amt\implicit_hierarchy.h">
+      <Filter>libds\amt</Filter>
+    </ClInclude>
+    <ClInclude Include="libds\amt\implicit_sequence.h">
+      <Filter>libds\amt</Filter>
+    </ClInclude>
+    <ClInclude Include="libds\amt\sequence.h">
+      <Filter>libds\amt</Filter>
+    </ClInclude>
+    <ClInclude Include="libds\amt\explicit_sequence.h">
+      <Filter>libds\amt</Filter>
+    </ClInclude>
+    <ClInclude Include="libds\adt\priority_queue.h">
+      <Filter>libds\adt</Filter>
+    </ClInclude>
+    <ClInclude Include="libds\adt\queue.h">
+      <Filter>libds\adt</Filter>
+    </ClInclude>
+    <ClInclude Include="libds\adt\stack.h">
+      <Filter>libds\adt</Filter>
+    </ClInclude>
+    <ClInclude Include="libds\amt\hierarchy.h">
+      <Filter>libds\amt</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

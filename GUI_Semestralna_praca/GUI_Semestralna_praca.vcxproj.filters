@@ -13,40 +13,20 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Source Files\Files">
-      <UniqueIdentifier>{2eb9fa98-5a69-4f09-989f-a83f50be49dc}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="SemestralnaPraca.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="Hlavne_okno.cpp">
+      <Filter>Header Files</Filter>
     </ClCompile>
-    <ClCompile Include="MemManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="UzemnyCelok.cpp">
+    <ClCompile Include="LHerdaUtils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="kraje.csv">
-      <Filter>Source Files\Files</Filter>
-    </None>
-    <None Include="obce.csv">
-      <Filter>Source Files\Files</Filter>
-    </None>
-    <None Include="okresy.csv">
-      <Filter>Source Files\Files</Filter>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="MemManager.h">
+    <ClInclude Include="Hlavne_okno.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\DataStructures\libds\heap_monitor.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="UzemnyCelok.h">
+    <ClInclude Include="LHerdaUtils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

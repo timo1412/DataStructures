@@ -1,7 +1,7 @@
 #pragma once
 
 #include <libds/adt/abstract_data_type.h>
-#include <libds/amt/implicit_sequence.h>
+#include <libds/amt/implicit_hierarchy.h>
 #include <libds/amt/explicit_sequence.h>
 
 namespace ds::adt {
@@ -71,29 +71,38 @@ namespace ds::adt {
     template<typename T>
     void ImplicitStack<T>::push(T element)
     {
-        this->getSequence()->insertLast().data_ = element;
+        // TODO 09
+        // po implementacii vymazte vyhodenie vynimky!
+        throw std::runtime_error("Not implemented yet");
+        this->getSequence()->insertLast(element);
     }
 
     template<typename T>
     T& ImplicitStack<T>::peek()
     {
-        if (this->isEmpty())
+        // TODO 09
+        // po implementacii vymazte vyhodenie vynimky!
+        throw std::runtime_error("Not implemented yet");
+        if (this->size() == 0)
         {
-            throw std::out_of_range("Stack is empty!");
+            throw std::runtime_error("Yasobnik je prazdny");
         }
-
-        return this->getSequence()->accessLast()->data_;
+        else
+        {
+            this->getSequence()->accessLast();
+        }
     }
 
     template<typename T>
     T ImplicitStack<T>::pop()
     {
-        if (this->isEmpty())
-        {
-            throw std::out_of_range("Stack is empty!");
-        }
+        // TODO 09
+        // po implementacii vymazte vyhodenie vynimky!
+        throw std::runtime_error("Not implemented yet");
+        if (this->size() == 0)
+            throw std::runtime_error("Yasobnik je prazdny");
 
-        T result = this->getSequence()->accessLast()->data_;
+        auto result = this->getSequence()->accessLast();
         this->getSequence()->removeLast();
         return result;
     }
@@ -119,31 +128,27 @@ namespace ds::adt {
     template<typename T>
     void ExplicitStack<T>::push(T element)
     {
-        this->getSequence()->insertFirst().data_ = element;
+        // TODO 09
+        // po implementacii vymazte vyhodenie vynimky!
+        throw std::runtime_error("Not implemented yet");
+        this->getSequence()->insertFirst(element);
     }
 
     template<typename T>
     T& ExplicitStack<T>::peek()
     {
-        if (this->isEmpty())
-        {
-            throw std::out_of_range("Stack is empty!");
-        }
-
-        return this->getSequence()->accessFirst()->data_;
+        // TODO 09
+        // po implementacii vymazte vyhodenie vynimky!
+        throw std::runtime_error("Not implemented yet");
+        
     }
 
     template<typename T>
     T ExplicitStack<T>::pop()
     {
-        if (this->isEmpty())
-        {
-            throw std::out_of_range("Stack is empty!");
-        }
-
-        T result = this->getSequence()->accessFirst()->data_;
-        this->getSequence()->removeFirst();
-        return result;
+        // TODO 09
+        // po implementacii vymazte vyhodenie vynimky!
+        throw std::runtime_error("Not implemented yet");
     }
 
     template<typename T>
