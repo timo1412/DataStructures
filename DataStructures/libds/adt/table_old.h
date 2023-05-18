@@ -2,6 +2,7 @@
 
 #include <libds/adt/abstract_data_type.h>
 #include <libds/amt/implicit_sequence.h>
+#include <libds/amt/implicit_hierarchy.h>
 #include <libds/amt/explicit_hierarchy.h>
 #include <functional>
 #include <random>
@@ -14,15 +15,7 @@ namespace ds::adt {
         K key_;
         T data_;
 
-        bool operator==(const TableItem<K, T>& other) const
-        {
-            return key_ == other.key_ && data_ == other.data_;
-        }
-
-        bool operator!=(const TableItem<K, T>& other) const
-        {
-            return !(*this == other);
-        }
+        bool operator==(const TableItem<K, T>& other) { return key_ == other.key_ && data_ == other.data_; }
     };
 
     template <typename K, typename T>
@@ -195,9 +188,11 @@ namespace ds::adt {
             SynonymTableIterator* synonymIterator_;
         };
 
-        HashTableIterator begin() const;
+        using IteratorType = HashTableIterator;
 
-        HashTableIterator end() const;
+        IteratorType begin() const;
+
+        IteratorType end() const;
     };
 
     //----------
@@ -208,7 +203,7 @@ namespace ds::adt {
         public ADS<TabItem<K, T>>
     {
     public:
-        using IteratorType = typename amt::BinaryEH<BlockType>::IteratorType;
+        using IteratorType = amt::BinaryEH<BlockType>;
 
     public:
         GeneralBinarySearchTree();
@@ -217,7 +212,6 @@ namespace ds::adt {
 
         size_t size() const override;
         bool isEmpty() const override;
-        void clear() override;
 
         void insert(K key, T data) override;
         bool tryFind(K key, T*& data) override;
@@ -227,17 +221,19 @@ namespace ds::adt {
         IteratorType end() const;
 
     protected:
-        using BSTNodeType = typename amt::BinaryEH<BlockType>::BlockType;
+        using BVSNodeType = typename amt::BinaryEH<BlockType>::BlockType;
 
         amt::BinaryEH<BlockType>* getHierarchy() const;
 
-        virtual void removeNode(BSTNodeType* node);
-        virtual void balanceTree(BSTNodeType* node) { }
+        virtual BVSNodeType* findNodeWithRelation(K key);
+        virtual BVSNodeType& insertNode(K key, BVSNodeType* relative);
+        virtual void removeNode(BVSNodeType* node);
+        virtual void balanceTree(BVSNodeType* node) { }
 
-        bool tryFindNodeWithKey(K key, BSTNodeType*& node) const;
+        bool tryFindNodeWithKey(K key, BVSNodeType*& node) const;
 
-        void rotateLeft(BSTNodeType* node);
-        void rotateRight(BSTNodeType* node);
+        void rotateLeft(BVSNodeType* node);
+        void rotateRight(BVSNodeType* node);
 
     private:
         size_t size_;
@@ -268,10 +264,10 @@ namespace ds::adt {
         Treap();
 
     protected:
-        using BSTNodeType = typename GeneralBinarySearchTree<K, T, TreapItem<K, T>>::BSTNodeType;
+        using BVSNodeType = typename GeneralBinarySearchTree<K, T, TreapItem<K, T>>::BVSNodeType;
 
-        void removeNode(BSTNodeType* node) override;
-        void balanceTree(BSTNodeType* node) override;
+        void removeNode(BVSNodeType* node) override;
+        void balanceTree(BVSNodeType* node) override;
 
     private:
         std::default_random_engine rng_;
@@ -279,13 +275,13 @@ namespace ds::adt {
 
     //----------
 
-   template<typename K, typename T>
+    template<typename K, typename T>
     T& Table<K, T>::find(K key)
     {
         T* data = nullptr;
         if (!this->tryFind(key, data))
         {
-            throw std::out_of_range("No such key!");
+            throw structure_error("No such key!");
         }
         return *data;
     }
@@ -314,13 +310,9 @@ namespace ds::adt {
     template<typename K, typename T, typename SequenceType>
     bool SequenceTable<K, T, SequenceType>::tryFind(K key, T*& data)
     {
-        BlockType* blockWithKey = this->findBlockWithKey(key);
-        if (blockWithKey == nullptr)
-        {
-            return false;
-        }
-        data = &blockWithKey->data_.data_;
-        return true;
+        // TODO 10
+        // po implementacii vymazte vyhodenie vynimky!
+        throw std::runtime_error("Not implemented yet");
     }
 
     template <typename K, typename T, typename SequenceType>
@@ -346,10 +338,9 @@ namespace ds::adt {
     template<typename K, typename T, typename SequenceType>
     typename SequenceType::BlockType* UnsortedSequenceTable<K, T, SequenceType>::findBlockWithKey(K key)
     {
-        return this->getSequence()->findBlockWithProperty([&key](typename SequenceType::BlockType* b) ->bool
-            {
-                return b->data_.key_ == key;
-            });
+        // TODO 10
+        // po implementacii vymazte vyhodenie vynimky!
+        throw std::runtime_error("Not implemented yet");
     }
 
     //----------
@@ -357,34 +348,17 @@ namespace ds::adt {
     template<typename K, typename T>
     void UnsortedImplicitSequenceTable<K, T>::insert(K key, T data)
     {
-        if (this->contains(key))
-        {
-            throw std::logic_error("Table already contains element associated with given key!");
-        }
-
-        TabItem<K, T>& tableItem = this->getSequence()->insertLast().data_;
-        tableItem.key_ = key;
-        tableItem.data_ = data;
+        // TODO 10
+        // po implementacii vymazte vyhodenie vynimky!
+        throw std::runtime_error("Not implemented yet");
     }
 
     template<typename K, typename T>
     T UnsortedImplicitSequenceTable<K, T>::remove(K key)
     {
-        BlockType* blockWithKey = this->findBlockWithKey(key);
-
-        if (blockWithKey == nullptr)
-        {
-            throw std::out_of_range("No such key!");
-        }
-
-        T result = blockWithKey->data_.data_;
-        BlockType* lastBlock = this->getSequence()->accessLast();
-        if (blockWithKey != lastBlock)
-        {
-            std::swap(blockWithKey->data_, lastBlock->data_);
-        }
-        this->getSequence()->removeLast();
-        return result;
+        // TODO 10
+        // po implementacii vymazte vyhodenie vynimky!
+        throw std::runtime_error("Not implemented yet");
     }
 
     //----------
@@ -392,35 +366,17 @@ namespace ds::adt {
     template<typename K, typename T>
     void UnsortedExplicitSequenceTable<K, T>::insert(K key, T data)
     {
-        if (this->contains(key))
-        {
-            throw std::logic_error("Table already contains element associated with given key!");
-        }
-
-        TabItem<K, T>& tableItem = this->getSequence()->insertFirst().data_;
-        tableItem.key_ = key;
-        tableItem.data_ = data;
+        // TODO 10
+        // po implementacii vymazte vyhodenie vynimky!
+        throw std::runtime_error("Not implemented yet");
     }
 
     template<typename K, typename T>
     T UnsortedExplicitSequenceTable<K, T>::remove(K key)
     {
-        BlockType* blockWithKey = this->findBlockWithKey(key);
-
-        if (blockWithKey == nullptr)
-        {
-            throw std::out_of_range("No such key!");
-        }
-
-        T result = blockWithKey->data_.data_;
-        BlockType* firstBlock = this->getSequence()->accessFirst();
-        if (blockWithKey != firstBlock)
-        {
-            using std::swap;
-            swap(blockWithKey->data_, firstBlock->data_);
-        }
-        this->getSequence()->removeFirst();
-        return result;
+        // TODO 10
+        // po implementacii vymazte vyhodenie vynimky!
+        throw std::runtime_error("Not implemented yet");
     }
 
     //----------
@@ -428,89 +384,32 @@ namespace ds::adt {
     template<typename K, typename T>
     void SortedSequenceTable<K, T>::insert(K key, T data)
     {
-        TabItem<K, T>* tableItem;
-
-        if (this->isEmpty())
-        {
-            tableItem = &this->getSequence()->insertFirst().data_;
-        }
-        else
-        {
-            BlockType* blok = nullptr;
-            if (this->tryFindBlockWithKey(key, 0, this->size(), blok))
-            {
-                throw std::logic_error("Duplicate key!");
-            }
-            tableItem = key > blok->data_.key_
-                ? &this->getSequence()->insertAfter(*blok).data_
-                : &this->getSequence()->insertBefore(*blok).data_;
-        }
-
-        tableItem->key_ = key;
-        tableItem->data_ = data;
+        // TODO 10
+        // po implementacii vymazte vyhodenie vynimky!
+        throw std::runtime_error("Not implemented yet");
     }
 
     template<typename K, typename T>
     T SortedSequenceTable<K, T>::remove(K key)
     {
-        BlockType* blockWithKey = nullptr;
-        if (!this->tryFindBlockWithKey(key, 0, this->size(), blockWithKey))
-        {
-            throw std::out_of_range("No such key!");
-        }
-
-        T result = blockWithKey->data_.data_;
-        if (this->getSequence()->accessFirst() == blockWithKey)
-        {
-            this->getSequence()->removeFirst();
-        }
-        else
-        {
-            this->getSequence()->removeNext(*this->getSequence()->accessPrevious(*blockWithKey));
-        }
-        return result;
+        // TODO 10
+        // po implementacii vymazte vyhodenie vynimky!
+        throw std::runtime_error("Not implemented yet");
     }
 
     template<typename K, typename T>
     auto SortedSequenceTable<K, T>::findBlockWithKey(K key) -> BlockType*
     {
         BlockType* blockWithKey = nullptr;
-        return this->tryFindBlockWithKey(key, 0, this->size(), blockWithKey)
-            ? blockWithKey
-            : nullptr;
+        return this->tryFindBlockWithKey(key, 0, this->size(), blockWithKey) ? blockWithKey : nullptr;
     }
 
     template<typename K, typename T>
     bool SortedSequenceTable<K, T>::tryFindBlockWithKey(K key, size_t firstIndex, size_t lastIndex, BlockType*& lastBlock)
     {
-        if (this->isEmpty())
-        {
-            lastBlock = nullptr;
-            return false;
-        }
-
-        size_t midIndex = firstIndex;
-        while (firstIndex < lastIndex)
-        {
-            midIndex = firstIndex + (lastIndex - firstIndex) / 2;
-            lastBlock = this->getSequence()->access(midIndex);
-
-            if (lastBlock->data_.key_ < key)
-            {
-                firstIndex = midIndex + 1;
-            }
-            else if (lastBlock->data_.key_ > key)
-            {
-                lastIndex = midIndex;
-            }
-            else
-            {
-                break;
-            }
-        }
-
-        lastBlock = this->getSequence()->access(midIndex);
-        return lastBlock->data_.key_ == key;
+        // TODO 10
+        // po implementacii vymazte vyhodenie vynimky!
+        throw std::runtime_error("Not implemented yet");
     }
 
     //----------
@@ -654,7 +553,6 @@ namespace ds::adt {
     HashTable<K, T>::HashTableIterator::~HashTableIterator()
     {
         delete tablesCurrent_;
-        delete tablesLast_;
         delete synonymIterator_;
     }
 
@@ -692,13 +590,13 @@ namespace ds::adt {
     template <typename K, typename T>
     TabItem<K, T>& HashTable<K, T>::HashTableIterator::operator*()
     {
-        return (**synonymIterator_);
+        return (**synonymIterator_).data_;
     }
 
     //----------
 
     template <typename K, typename T>
-    typename HashTable<K, T>::HashTableIterator HashTable<K, T>::begin() const
+    auto HashTable<K, T>::begin() const -> IteratorType
     {
         return HashTableIterator(
             new PrimaryRegionIterator(primaryRegion_->begin()),
@@ -707,7 +605,7 @@ namespace ds::adt {
     }
 
     template <typename K, typename T>
-    typename HashTable<K, T>::HashTableIterator HashTable<K, T>::end() const
+    auto HashTable<K, T>::end() const -> IteratorType
     {
         return HashTableIterator(
             new PrimaryRegionIterator(primaryRegion_->end()),
@@ -748,7 +646,7 @@ namespace ds::adt {
     }
 
     template<typename K, typename T, typename BlockType>
-    void GeneralBinarySearchTree<K, T, BlockType>::clear()
+    void GeneralBinarySearchTree<K, T, BlockType>::insert(K key, T data)
     {
         // TODO 11
         // po implementacii vymazte vyhodenie vynimky!
@@ -756,57 +654,19 @@ namespace ds::adt {
     }
 
     template<typename K, typename T, typename BlockType>
-    void GeneralBinarySearchTree<K, T, BlockType>::insert(K key, T data)
-    {
-        BSTNodeType* newNode = nullptr;
-        if (this->isEmpty())
-        {
-            newNode = &this->getHierarchy()->emplaceRoot();
-        }
-        else
-        {
-            BSTNodeType* parent = nullptr;
-            if (this->tryFindNodeWithKey(key, parent))
-            {
-                throw std::logic_error("Table already contains an element associated with given key!");
-            }
-            newNode = key > parent->data_.key_
-                ? &this->getHierarchy()->insertRightSon(*parent)
-                : &this->getHierarchy()->insertLeftSon(*parent);
-        }
-
-        newNode->data_.key_ = key;
-        newNode->data_.data_ = data;
-
-        ++size_;
-        this->balanceTree(newNode);
-    }
-
-    template<typename K, typename T, typename BlockType>
     bool GeneralBinarySearchTree<K, T, BlockType>::tryFind(K key, T*& data)
     {
-        BSTNodeType* nodeWithKey = nullptr;
-        if (!this->tryFindNodeWithKey(key, nodeWithKey))
-        {
-            return false;
-        }
-        data = &nodeWithKey->data_.data_;
-        return true;
+        // TODO 11
+        // po implementacii vymazte vyhodenie vynimky!
+        throw std::runtime_error("Not implemented yet");
     }
 
     template<typename K, typename T, typename BlockType>
     T GeneralBinarySearchTree<K, T, BlockType>::remove(K key)
     {
-        BSTNodeType* nodeWithKey = nullptr;
-        if (!this->tryFindNodeWithKey(key, nodeWithKey))
-        {
-            throw std::out_of_range("No such key!");
-        }
-
-        T result = nodeWithKey->data_.data_;
-        this->removeNode(nodeWithKey);
-        size_--;
-        return result;
+        // TODO 11
+        // po implementacii vymazte vyhodenie vynimky!
+        throw std::runtime_error("Not implemented yet");
     }
 
     template <typename K, typename T, typename BlockType>
@@ -828,7 +688,23 @@ namespace ds::adt {
     }
 
     template<typename K, typename T, typename BlockType>
-    void GeneralBinarySearchTree<K, T, BlockType>::removeNode(BSTNodeType* node)
+    auto GeneralBinarySearchTree<K, T, BlockType>::findNodeWithRelation(K key) -> BVSNodeType*
+    {
+        BVSNodeType* node = nullptr;
+        this->tryFindNodeWithKey(key, node);
+        return node;
+    }
+
+    template<typename K, typename T, typename BlockType>
+    auto GeneralBinarySearchTree<K, T, BlockType>::insertNode(K key, BVSNodeType* relative) -> BVSNodeType&
+    {
+        return key > relative->data_.key_
+            ? this->getHierarchy()->insertRightSon(*relative)
+            : this->getHierarchy()->insertLeftSon(*relative);
+    }
+
+    template<typename K, typename T, typename BlockType>
+    void GeneralBinarySearchTree<K, T, BlockType>::removeNode(BVSNodeType* node)
     {
         // TODO 11
         // po implementacii vymazte vyhodenie vynimky!
@@ -836,45 +712,7 @@ namespace ds::adt {
     }
 
     template<typename K, typename T, typename BlockType>
-    bool GeneralBinarySearchTree<K, T, BlockType>::tryFindNodeWithKey(K key, BSTNodeType*& node) const
-    {
-        if (this->isEmpty())
-        {
-            return false;
-        }
-
-        node = this->getHierarchy()->accessRoot();
-        while (node->data_.key_ != key && !this->getHierarchy()->isLeaf(*node))
-        {
-            if (key < node->data_.key_)
-            {
-                if (this->getHierarchy()->hasLeftSon(*node))
-                {
-                    node = this->getHierarchy()->accessLeftSon(*node);
-                }
-                else
-                {
-                    return false;
-                }
-            }
-            else
-            {
-                if (this->getHierarchy()->hasRightSon(*node))
-                {
-                    node = this->getHierarchy()->accessRightSon(*node);
-                }
-                else
-                {
-                    return false;
-                }
-            }
-        }
-
-        return node->data_.key_ == key;
-    }
-
-    template<typename K, typename T, typename BlockType>
-    void GeneralBinarySearchTree<K, T, BlockType>::rotateLeft(BSTNodeType* node)
+    bool GeneralBinarySearchTree<K, T, BlockType>::tryFindNodeWithKey(K key, BVSNodeType*& node) const
     {
         // TODO 11
         // po implementacii vymazte vyhodenie vynimky!
@@ -882,7 +720,15 @@ namespace ds::adt {
     }
 
     template<typename K, typename T, typename BlockType>
-    void GeneralBinarySearchTree<K, T, BlockType>::rotateRight(BSTNodeType* node)
+    void GeneralBinarySearchTree<K, T, BlockType>::rotateLeft(BVSNodeType* node)
+    {
+        // TODO 11
+        // po implementacii vymazte vyhodenie vynimky!
+        throw std::runtime_error("Not implemented yet");
+    }
+
+    template<typename K, typename T, typename BlockType>
+    void GeneralBinarySearchTree<K, T, BlockType>::rotateRight(BVSNodeType* node)
     {
         // TODO 11
         // po implementacii vymazte vyhodenie vynimky!
@@ -898,7 +744,7 @@ namespace ds::adt {
     }
 
     template<typename K, typename T>
-    void Treap<K, T>::removeNode(BSTNodeType* node)
+    void Treap<K, T>::removeNode(BVSNodeType* node)
     {
         // TODO 11
         // po implementacii vymazte vyhodenie vynimky!
@@ -906,7 +752,7 @@ namespace ds::adt {
     }
 
     template<typename K, typename T>
-    void Treap<K, T>::balanceTree(BSTNodeType* node)
+    void Treap<K, T>::balanceTree(BVSNodeType* node)
     {
         // TODO 11
         // po implementacii vymazte vyhodenie vynimky!

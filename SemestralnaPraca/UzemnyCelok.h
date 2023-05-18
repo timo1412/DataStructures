@@ -33,6 +33,7 @@ public:
 	string getShortTitle() { return this->shortTitle; }
 	string getNote() { return this->note; }
 	Type getType() { return this->type; }
+	bool hasType(Type p_type) { return this->type == p_type; }
 	bool operator==(const UzemnyCelok other	)
 	{
 		return this->getCode() == other.code;
