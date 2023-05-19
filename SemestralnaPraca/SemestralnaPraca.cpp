@@ -2,6 +2,7 @@
 #include "libds/amt/explicit_sequence.h"
 #include "libds/amt/explicit_hierarchy.h"
 #include "libds/adt/table.h"
+#include "libds/adt/list.h"
 #include <Windows.h>
 #include "UzemnyCelok.h"
 
@@ -171,6 +172,27 @@ void PrechadzajHierarchiu(ds::amt::MultiWayExplicitHierarchy<UzemnyCelok>* p_m_h
     }
 }
 
+void NacitajDoTabulky(ds::adt::HashTable<string, UzemnyCelok> *p_table, vector<UzemnyCelok> p_kraje)
+{
+	for(int i = 0 ; i < p_kraje.size();i++)
+	{
+        p_table->insert(p_kraje.at(i).getTitle() ,p_kraje.at(i));
+	}
+}
+
+void Vypis_podla_stringu(string str, ds::adt::HashTable<string, UzemnyCelok>* p_table)
+{
+    vector<UzemnyCelok> duplicity;
+    UzemnyCelok* uzeemna_jednotka = nullptr;
+    for (auto iterator = p_table->begin(); iterator != p_table->end(); ++iterator)
+    {
+	    if ((*iterator).key_ == "Višòové")
+	    {
+            cout << (*iterator).data_.getCode() << (*iterator).data_.getTitle() << endl;
+	    }
+    }
+}
+
 int main()
 {
     initHeapMonitor();
@@ -209,22 +231,21 @@ int main()
     
     cout << "==============================" << endl;
 
-    PrechadzajHierarchiu(&m_hierarchzy);
+    auto hashFunction = [](const std::string& key)
+    {
+        size_t hash = 0;
+        for (char ch : key) {
+            hash = hash * 37 + ch;
+        }
+        return hash;
+    };
+    ds::adt::HashTable<string, UzemnyCelok> table(hashFunction,loadObce.size());
 
-    ds::adt::SequenceTable<int, UzemnyCelok> table;
+    NacitajDoTabulky(&table, loadObce);
+    
+    cout << "htovo" << endl;
 
+    Vypis_podla_stringu("Prievidza", &table);
+
+    cout << "htovo" << endl;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-

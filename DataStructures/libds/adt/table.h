@@ -208,7 +208,7 @@ namespace ds::adt {
         public ADS<TabItem<K, T>>
     {
     public:
-        using IteratorType = typename amt::BinaryEH<BlockType>::IteratorType;
+        using IteratorType = amt::BinaryEH<BlockType>;
 
     public:
         GeneralBinarySearchTree();
@@ -254,7 +254,7 @@ namespace ds::adt {
     //----------
 
     template <typename K, typename T>
-    struct TreapItem:
+    struct TreapItem :
         public TabItem<K, T>
     {
         int priority_;
@@ -279,13 +279,13 @@ namespace ds::adt {
 
     //----------
 
-   template<typename K, typename T>
+    template<typename K, typename T>
     T& Table<K, T>::find(K key)
     {
         T* data = nullptr;
         if (!this->tryFind(key, data))
         {
-            throw std::out_of_range("No such key!");
+            throw structure_error("No such key!");
         }
         return *data;
     }
@@ -346,10 +346,10 @@ namespace ds::adt {
     template<typename K, typename T, typename SequenceType>
     typename SequenceType::BlockType* UnsortedSequenceTable<K, T, SequenceType>::findBlockWithKey(K key)
     {
-        return this->getSequence()->findBlockWithProperty([&key](typename SequenceType::BlockType* b) ->bool
-            {
-                return b->data_.key_ == key;
-            });
+        return this->getSequence()->findBlockWithProperty([&key](typename SequenceType::BlockType* b)-> bool {
+            return b->data_.key_ == key;
+            }
+        );
     }
 
     //----------
@@ -392,10 +392,10 @@ namespace ds::adt {
     template<typename K, typename T>
     void UnsortedExplicitSequenceTable<K, T>::insert(K key, T data)
     {
-        if (this->contains(key))
+        /*if (this->contains(key))
         {
             throw std::logic_error("Table already contains element associated with given key!");
-        }
+        }*/
 
         TabItem<K, T>& tableItem = this->getSequence()->insertFirst().data_;
         tableItem.key_ = key;
@@ -475,9 +475,7 @@ namespace ds::adt {
     auto SortedSequenceTable<K, T>::findBlockWithKey(K key) -> BlockType*
     {
         BlockType* blockWithKey = nullptr;
-        return this->tryFindBlockWithKey(key, 0, this->size(), blockWithKey)
-            ? blockWithKey
-            : nullptr;
+        return this->tryFindBlockWithKey(key, 0, this->size(), blockWithKey) ? blockWithKey : nullptr;
     }
 
     template<typename K, typename T>
@@ -605,30 +603,50 @@ namespace ds::adt {
     template <typename K, typename T>
     void HashTable<K, T>::insert(K key, T data)
     {
-        // TODO 11
-        // po implementacii vymazte vyhodenie vynimky!
-        throw std::runtime_error("Not implemented yet");
+        size_t index = hashFunction_(key) % primaryRegion_->size();
+        SynonymTable* synonyms = primaryRegion_->access(index)->data_;
+        if (!synonyms)
+        {
+            synonyms = new SynonymTable();
+            primaryRegion_->access(index)->data_ = synonyms;
+        }
+        synonyms->insert(key, data);
+        size_++;
     }
 
     template <typename K, typename T>
     bool HashTable<K, T>::tryFind(K key, T*& data)
     {
-        // TODO 11
-        // po implementacii vymazte vyhodenie vynimky!
-        throw std::runtime_error("Not implemented yet");
+        int index = hashFunction_(key) % primaryRegion_->size();
+        SynonymTable* synonyms = primaryRegion_->access(index)->data_;
+        if (synonyms == nullptr) {
+            return false;
+        }
+        return synonyms->tryFind(key, data);
     }
 
     template <typename K, typename T>
     T HashTable<K, T>::remove(K key)
     {
-        // TODO 11
-        // po implementacii vymazte vyhodenie vynimky!
-        throw std::runtime_error("Not implemented yet");
+        size_t index = hashFunction_(key) % primaryRegion_->size();
+        SynonymTable* synonyms = primaryRegion_->access(index)->data_;
+        if (!synonyms)
+        {
+            throw structure_error("No such key present!");
+        }
+        T item = synonyms->remove(key);
+        if (synonyms->isEmpty())
+        {
+            delete synonyms;
+            primaryRegion_->access(index)->data_ = nullptr;
+        }
+        size_--;
+        return item;
     }
 
     template <typename K, typename T>
     HashTable<K, T>::HashTableIterator::HashTableIterator
-        (PrimaryRegionIterator* tablesFirst, PrimaryRegionIterator* tablesLast) :
+    (PrimaryRegionIterator* tablesFirst, PrimaryRegionIterator* tablesLast) :
         tablesCurrent_(tablesFirst),
         tablesLast_(tablesLast)
     {
@@ -643,10 +661,13 @@ namespace ds::adt {
 
     template <typename K, typename T>
     HashTable<K, T>::HashTableIterator::HashTableIterator
-        (const HashTableIterator& other) :
-        tablesCurrent_(other.tablesCurrent_),
-        tablesLast_(other.tablesLast_),
-        synonymIterator_(other.synonymIterator_)
+    (const HashTableIterator& other) :
+        tablesCurrent_(new PrimaryRegionIterator(*other.tablesCurrent_)),
+        tablesLast_(new PrimaryRegionIterator(*other.tablesLast_)),
+        synonymIterator_(other.synonymIterator_ != nullptr
+            ? new SynonymTableIterator(*other.synonymIterator_)
+            : nullptr
+        )
     {
     }
 
@@ -661,9 +682,22 @@ namespace ds::adt {
     template <typename K, typename T>
     auto HashTable<K, T>::HashTableIterator::operator++() -> HashTableIterator&
     {
-        // TODO 11
-        // po implementacii vymazte vyhodenie vynimky!
-        throw std::runtime_error("Not implemented yet");
+        ++(*synonymIterator_);
+        SynonymTableIterator oldIt = *synonymIterator_;
+        if (!(oldIt != (**tablesCurrent_)->end()))
+        {
+            do
+            {
+                ++(*tablesCurrent_);
+            } while (*tablesCurrent_ != *tablesLast_ && **tablesCurrent_ == nullptr);
+            delete synonymIterator_;
+            synonymIterator_ = nullptr;
+            if (*tablesCurrent_ != *tablesLast_)
+            {
+                synonymIterator_ = new SynonymTableIterator((**tablesCurrent_)->begin());
+            }
+        }
+        return *this;
     }
 
     template <typename K, typename T>
@@ -678,9 +712,9 @@ namespace ds::adt {
     bool HashTable<K, T>::HashTableIterator::operator==(const HashTableIterator& other) const
     {
         return synonymIterator_ == other.synonymIterator_ ||
-                 (synonymIterator_ != nullptr &&
-                   other.synonymIterator_ != nullptr &&
-                   *synonymIterator_ == *(other.synonymIterator_));
+            (synonymIterator_ != nullptr &&
+                other.synonymIterator_ != nullptr &&
+                *synonymIterator_ == *(other.synonymIterator_));
     }
 
     template <typename K, typename T>
@@ -716,14 +750,14 @@ namespace ds::adt {
     }
 
     template<typename K, typename T, typename BlockType>
-    GeneralBinarySearchTree<K, T, BlockType>::GeneralBinarySearchTree():
+    GeneralBinarySearchTree<K, T, BlockType>::GeneralBinarySearchTree() :
         ADS<TabItem<K, T>>(new amt::BinaryEH<BlockType>()),
         size_(0)
     {
     }
 
     template<typename K, typename T, typename BlockType>
-    GeneralBinarySearchTree<K, T, BlockType>::GeneralBinarySearchTree(const GeneralBinarySearchTree& other):
+    GeneralBinarySearchTree<K, T, BlockType>::GeneralBinarySearchTree(const GeneralBinarySearchTree& other) :
         ADS<TabItem<K, T>>(new amt::BinaryEH<BlockType>(), other),
         size_(other.size_)
     {
@@ -892,7 +926,7 @@ namespace ds::adt {
     //----------
 
     template<typename K, typename T>
-    Treap<K, T>::Treap():
+    Treap<K, T>::Treap() :
         rng_(std::rand())
     {
     }

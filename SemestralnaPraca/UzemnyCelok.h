@@ -34,9 +34,13 @@ public:
 	string getNote() { return this->note; }
 	Type getType() { return this->type; }
 	bool hasType(Type p_type) { return this->type == p_type; }
-	bool operator==(const UzemnyCelok other	)
+	bool operator==(const UzemnyCelok other	) const
 	{
-		return this->getCode() == other.code;
+		return this->code == other.code;
+	}
+	bool operator!=(const UzemnyCelok other) const
+	{
+		return this->code != other.code;
 	}
 };
 
