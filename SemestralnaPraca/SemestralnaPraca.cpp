@@ -1,6 +1,8 @@
 
 #include "libds/amt/explicit_sequence.h"
+#include "libds/amt/implicit_sequence.h"
 #include "libds/amt/explicit_hierarchy.h"
+#include "libds/adt/sorts.h"
 #include "libds/adt/table.h"
 #include "libds/adt/list.h"
 #include <Windows.h>
@@ -35,22 +37,19 @@ vector<string> SplitStr(string str)
 	    }
 	    else
 	    {
-            
             splitStirngs.push_back(findString);
             findString = "";
 	    }
     }
-
     splitStirngs.push_back(findString);
 	return splitStirngs;
 }
 
-vector<UzemnyCelok> NacitajUzemnyCelok(string p_path)
+ds::amt::ImplicitSequence<UzemnyCelok> NacitajUzemnyCelok(string p_path)
 {
     ifstream file_stream;
     file_stream.open(p_path);
-    vector<UzemnyCelok> UzemneCelky;
-	//ds:amt::ExplicitSequence<UzemnyCelok> uzemne_celky_seq;
+	ds:amt::ImplicitSequence<UzemnyCelok> uzemne_celky_seq;
 
     if (file_stream.fail())
         printf("Cannot open file");
@@ -76,46 +75,110 @@ vector<UzemnyCelok> NacitajUzemnyCelok(string p_path)
         else
             type = OBEC;
 
-    	UzemnyCelok uzemny_celok = UzemnyCelok(sortNumber,obecString.at(1),obecString.at(2),obecString.at(3),obecString.at(4),obecString.at(5),type);
-    	UzemneCelky.push_back(uzemny_celok);
+    	auto uzemny_celok = UzemnyCelok(sortNumber,obecString.at(1),obecString.at(2),obecString.at(3),obecString.at(4),obecString.at(5),type);
+    	
+        uzemne_celky_seq.insertLast();
+        uzemne_celky_seq.accessLast()->data_ = uzemny_celok;
     }
-	return UzemneCelky;
+	return uzemne_celky_seq;
 }
 
-void NaplnHierarchiu(ds::amt::MultiWayExplicitHierarchy<UzemnyCelok> *p_m_hierar, vector<UzemnyCelok> p_kraje, vector<UzemnyCelok> p_okresy, vector<UzemnyCelok> p_obce)
+
+
+ds::amt::MultiWayExplicitHierarchy<UzemnyCelok> NaplnHierarchiu(ds::amt::ImplicitSequence<UzemnyCelok> p_kraje_seq, ds::amt::ImplicitSequence<UzemnyCelok> p_okresy_seq, ds::amt::ImplicitSequence<UzemnyCelok> p_obce_seq)
 {
-    cout << "==============================" << endl;
+	ds::amt::MultiWayExplicitHierarchy<UzemnyCelok> p_m_hierar;
 
-    for (int i = 0 ; i < p_kraje.size() ; i++)
-    {
-        p_m_hierar->emplaceSon(*p_m_hierar->accessRoot(), i).data_ = p_kraje.at(i);
-        for (int j = 0 ; j < p_okresy.size();j++)
-        {
-            int index_ukladania_hierarchie_okresu = 0;
-            if (p_m_hierar->accessSon(*p_m_hierar->accessRoot(), i)->data_.getNote().substr(5, 5) == p_okresy.at(j).getCode().substr(0,5))
-	        {
-            	p_m_hierar->emplaceSon(*p_m_hierar->accessSon(*p_m_hierar->accessRoot(), i), index_ukladania_hierarchie_okresu).data_ = p_okresy.at(j);
-                
-                for (int l = 0 ; l < p_obce.size(); l++)
-                {
-	                if (p_m_hierar->accessSon(*p_m_hierar->accessSon(*p_m_hierar->accessRoot(), i),index_ukladania_hierarchie_okresu)->data_.getCode() == p_obce.at(l).getCode().substr(0,6))
-	                {
-                        int index_ukladania_hierarchie_obce = 0;
-                        p_m_hierar->emplaceSon(*p_m_hierar->accessSon(*p_m_hierar->accessSon(*p_m_hierar->accessRoot(), i), index_ukladania_hierarchie_okresu), index_ukladania_hierarchie_obce).data_ = p_obce.at(l);
-                        index_ukladania_hierarchie_obce++;
-	                }
-                }
-                index_ukladania_hierarchie_okresu++;
-	        }
-        }
-    }
+   p_m_hierar.emplaceRoot().data_ = UzemnyCelok(1,"","Slovenska republika","","","",KRAJINA);
+   auto& root = *p_m_hierar.accessRoot();
+
+   for (int i = 0 ; i < p_kraje_seq.size() ; i++)
+   {
+       auto& kraj = p_m_hierar.emplaceSon(root, i);
+       kraj.data_ = p_kraje_seq.access(i)->data_;
+       
+   	 p_m_hierar.emplaceSon(*p_m_hierar.accessRoot(), i).data_ = p_kraje_seq.access(i)->data_;
+       for (int j = 0 ; j < p_okresy_seq.size();j++)
+       {
+           int index_ukladania_hierarchie_okresu = 0;
+           if (p_m_hierar.accessSon(*p_m_hierar.accessRoot(), i)->data_.getNote().substr(5, 5) == p_okresy_seq.access(j)->data_.getCode().substr(0,5))
+           {
+               p_m_hierar.emplaceSon(*p_m_hierar.accessSon(*p_m_hierar.accessRoot(), i), index_ukladania_hierarchie_okresu).data_ = p_okresy_seq.access(j)->data_;
+               p_m_hierar.accessSon(*p_m_hierar.accessRoot(), 1)->sons_;
+               for (int l = 0 ; l < p_obce_seq.size(); l++)
+               {
+                   if (p_m_hierar.accessSon(*p_m_hierar.accessSon(*p_m_hierar.accessRoot(), i),index_ukladania_hierarchie_okresu)->data_.getCode() == p_obce_seq.access(l)->data_.getCode().substr(0,6))
+                   {
+                       int index_ukladania_hierarchie_obce = 0;
+                       p_m_hierar.emplaceSon(*p_m_hierar.accessSon(*p_m_hierar.accessSon(*p_m_hierar.accessRoot(), i), index_ukladania_hierarchie_okresu), index_ukladania_hierarchie_obce).data_ = p_obce_seq.access(l)->data_;
+                       index_ukladania_hierarchie_obce++;
+                   }
+               }
+               index_ukladania_hierarchie_okresu++;
+           }
+       }
+   }
+
+   return p_m_hierar;
 }
 
+
+
+void ZoradSynovHieraarchie( ds::amt::MultiWayExplicitHierarchyBlock<UzemnyCelok>* node)
+{
+    ds::adt::BubbleSort<amt::MultiWayExplicitHierarchyBlock<UzemnyCelok>*> sort;
+    auto compareVowelsCount = [](ds::amt::MultiWayExplicitHierarchyBlock<UzemnyCelok>* node_a, ds::amt::MultiWayExplicitHierarchyBlock<UzemnyCelok>* node_b)
+    {
+        int cout_a = 0;
+        int cout_b = 0;
+
+        const string samohlasky = "aeiouAEIOUáéíóú";
+        
+        for (int i = 0; i < node_a->data_.getTitle().size(); i++)
+        {
+            char ch = node_a->data_.getTitle()[i];
+            if (i - 1 != node_a->data_.getTitle().size() - 1)
+            {
+                char dvoj = node_a->data_.getTitle()[i+1];
+                if (ch == 'i' && (dvoj == 'a' || dvoj == 'u' || dvoj == 'e'))
+                {
+                    i++;
+                    continue;
+                }
+            }
+
+            if (samohlasky.find(ch) != string::npos)
+                cout_a++;
+        }
+
+        for (int i = 0; i < node_b->data_.getTitle().size(); i++)
+        {
+            char ch = node_b->data_.getTitle()[i];
+            if (i - 1 != node_b->data_.getTitle().size() - 1)
+            {
+                char dvoj = node_b->data_.getTitle()[i + 1];
+                if (ch == 'i' && (dvoj == 'a' || dvoj == 'u' || dvoj == 'e'))
+                {
+                    i++;
+                    continue;
+                }
+            }
+
+            if (samohlasky.find(ch) != string::npos)
+                cout_b++;
+        }
+
+        return cout_a < cout_b;
+    };
+
+    sort.sort(*node->sons_, compareVowelsCount);
+}
 
 void PrechadzajHierarchiu(ds::amt::MultiWayExplicitHierarchy<UzemnyCelok>* p_m_hierar)
 {
     string vstup = "";
     string ukoncovaci_znak = "X";
+   // cout<< p_m_hierar->accessRoot()->data_.getTitle()<<endl;
     auto current = p_m_hierar->accessRoot();
     int index = 0;
     while (vstup != ukoncovaci_znak)
@@ -133,10 +196,12 @@ void PrechadzajHierarchiu(ds::amt::MultiWayExplicitHierarchy<UzemnyCelok>* p_m_h
         {
         case 1:
 	        {
+                //ZoradSynovHieraarchie( current);
 		        for (auto son : *current->sons_)
 		        {
                     cout << son->data_.getTitle() << endl;
 		        }
+                break;
 	        }
         case 2:
 	        {
@@ -172,11 +237,11 @@ void PrechadzajHierarchiu(ds::amt::MultiWayExplicitHierarchy<UzemnyCelok>* p_m_h
     }
 }
 
-void NacitajDoTabulky(ds::adt::HashTable<string, UzemnyCelok> *p_table, vector<UzemnyCelok> p_kraje)
+void NacitajDoTabulky(ds::adt::HashTable<string, UzemnyCelok> *p_table, ds::amt::ImplicitSequence<UzemnyCelok> p_kraje)
 {
 	for(int i = 0 ; i < p_kraje.size();i++)
 	{
-        p_table->insert(p_kraje.at(i).getTitle() ,p_kraje.at(i));
+        p_table->insert(p_kraje.access(i)->data_.getTitle() ,p_kraje.access(i)->data_);
 	}
 }
 
@@ -193,17 +258,13 @@ void Vypis_podla_stringu(string str, ds::adt::HashTable<string, UzemnyCelok>* p_
     }
 }
 
+
+
 int main()
 {
     initHeapMonitor();
     SetConsoleOutputCP(1250);
     SetConsoleCP(1250);
-    
-    ds::amt::MultiWayExplicitHierarchy<UzemnyCelok> m_hierarchzy;
-
-	//ds:amt::ExplicitSequence<UzemnyCelok> kraje_seq;
-	//ds:amt::ExplicitSequence<UzemnyCelok> okresy_seq;
-	//ds:amt::ExplicitSequence<UzemnyCelok> obce_seq;
 
     string path_kraje = "kraje.csv";
 	string path_okresy = "okresy.csv";
@@ -215,21 +276,18 @@ int main()
     ifstream okresy;
     ifstream obce;
 
-    vector<UzemnyCelok> loadKraje;
-    vector<UzemnyCelok> loadOkresy;
-    vector<UzemnyCelok> loadObce;
+    auto loadKraje = NacitajUzemnyCelok(path_kraje);
+    auto loadOkresy =NacitajUzemnyCelok(path_okresy);
+    auto loadObce = NacitajUzemnyCelok(path_obce);
 
-    loadKraje = NacitajUzemnyCelok(path_kraje);
-    loadOkresy = NacitajUzemnyCelok( path_okresy);
-    loadObce = NacitajUzemnyCelok( path_obce);
+    auto m_hierarchzy = NaplnHierarchiu(loadKraje, loadOkresy, loadObce);
 
-    UzemnyCelok main_root = UzemnyCelok(0, "00", "Slovenska republika", "slovensko", "sk", "svk", KRAJINA);
+    m_hierarchzy.processLevelOrder(m_hierarchzy.accessRoot(), [&](ds::amt::MultiWayExplicitHierarchyBlock<UzemnyCelok> * block)
+        {
+            cout << block->data_.getTitle()<<endl;
+        });
 
-    m_hierarchzy.emplaceRoot().data_ = main_root;
-
-    NaplnHierarchiu(&m_hierarchzy, loadKraje, loadOkresy, loadObce);
-    
-    cout << "==============================" << endl;
+    //PrechadzajHierarchiu(&m_hierarchzy);
 
     auto hashFunction = [](const std::string& key)
     {
@@ -248,4 +306,65 @@ int main()
     Vypis_podla_stringu("Prievidza", &table);
 
     cout << "htovo" << endl;
+
+    //pocet_samohlasok_string();
+
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//int currentKrajIterator = 0;
+//int currentOkresIteratot = 0;
+//int currentObecIterator = 0;
+//int insertOkresIterator = 0;
+//int insertObecIterator = 0;
+//ds::amt::MultiWayExplicitHierarchy<UzemnyCelok> hierarchy;
+
+//hierarchy.emplaceRoot().data_ = UzemnyCelok(1, "", "Slovensko", "", "", "", KRAJINA);
+
+
+//auto& root = *hierarchy.accessRoot();
+
+//for (int krajeIterator = 0; krajeIterator < kraje.size(); krajeIterator++)
+//{
+//    auto& kraj = hierarchy.emplaceSon(root, krajeIterator);
+//    kraj.data_ = kraje.access(krajeIterator)->data_;
+
+//    for (int okresyIterator = 0; okresyIterator < okresy.size(); okresyIterator++)
+//    {
+//        if (kraj.data_.getCode() == okresy.access(okresyIterator)->data_.getNote().substr(0, 1))
+//        {
+//            auto& okres = hierarchy.emplaceSon(kraj, insertOkresIterator);
+//            okres.data_ = okresy.access(okresyIterator)->data_;
+
+//            for (int obceIterator = 0; obceIterator < obce.size(); obceIterator++)
+//            {
+//                if (okres.data_.getCode() == obce.access(obceIterator)->data_.getCode().substr(0, 6))
+//                {
+//                    auto& obec = hierarchy.emplaceSon(okres, insertObecIterator);
+//                    obec.data_ = obce.access(obceIterator)->data_;
+//                }
+//                else insertObecIterator = 0;
+//            }
+//        }
+//        else insertOkresIterator = 0;
+//    }
+//}
+//return hierarchy;
